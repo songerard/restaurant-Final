@@ -2,6 +2,14 @@
 const express = require('express')
 const app = express()
 
+// require express-session
+const session = require('express-session')
+app.use(session({
+  secret: 'Restaurant',
+  resave: false,
+  saveUninitialized: true
+}))
+
 // require mongodb config
 require('./config/mongoose')
 
