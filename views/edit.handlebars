@@ -1,0 +1,115 @@
+<div class="container mt-3">
+  <h2 class="my-3">更新餐廳資料</h2>
+  <form action="/restaurants/{{ restaurant._id }}?_method=PUT" method="POST" class="needs-validation" novalidate>
+    <div class="form-group row">
+      <label for="name" class="col-sm-3 col-form-label">中文文名稱</label>
+      <div class="col-sm-9">
+        <input type="text" class="form-control" id="name" name="name" placeholder="Input name" required
+          pattern=".*\S+.*" value="{{ restaurant.name }}">
+        <div class="invalid-feedback">
+          請輸入有效資料
+        </div>
+      </div>
+    </div>
+    <div class="form-group row">
+      <label for="name_en" class="col-sm-3 col-form-label">英文名稱</label>
+      <div class="col-sm-9">
+        <input type="text" class="form-control" id="name_en" name="name_en" placeholder="Input English name" required
+          pattern=".*\S+.*" value="{{ restaurant.name_en }}">
+        <div class="invalid-feedback">
+          請輸入有效資料
+        </div>
+      </div>
+    </div>
+    <div class="form-group row">
+      <label for="category" class="col-sm-3 col-form-label">類別</label>
+      <div class="form-group col-md-3 my-1">
+        <select id="inputCategory" class="form-control" name="category" onchange="categoryForm(this.value)">
+          {{#each allCategory}}
+          <option {{#if_eq this }}selected{{/if_eq}}>{{ this }}</option>
+          {{/each}}
+          <option>其他</option>
+        </select>
+      </div>
+      <div class="col-sm-6 mt-1">
+        <input type="text" class="form-control invisible other-category" id="category" name="other_category"
+          placeholder="Input category">
+        <div class="invalid-feedback">
+          請輸入有效資料
+        </div>
+      </div>
+    </div>
+    <div class="form-group row">
+      <label for="image" class="col-sm-3 col-form-label">相片網址</label>
+      <div class="col-sm-9">
+        <input type="text" class="form-control" id="image" name="image" placeholder="Input image URL" required
+          pattern=".*\S+.*" value="{{ restaurant.image }}">
+        <div class="invalid-feedback">
+          請輸入有效資料
+        </div>
+      </div>
+    </div>
+    <div class="form-group row">
+      <label for="location" class="col-sm-3 col-form-label">地點</label>
+      <div class="col-sm-9">
+        <input type="text" class="form-control" id="location" name="location" placeholder="Input location" required
+          pattern=".*\S+.*" value="{{ restaurant.location }}">
+        <div class="invalid-feedback">
+          請輸入有效資料
+        </div>
+      </div>
+    </div>
+    <div class="form-group row">
+      <label for="phone" class="col-sm-3 col-form-label">電話</label>
+      <div class="col-sm-9">
+        <input type="text" class="form-control" id="phone" name="phone" placeholder="Input phone" required
+          pattern=".*\S+.*" value="{{ restaurant.phone }}">
+        <div class="invalid-feedback">
+          請輸入有效資料
+        </div>
+      </div>
+    </div>
+    <div class="form-group row">
+      <label for="google_map" class="col-sm-3 col-form-label">Google map 網址</label>
+      <div class="col-sm-9">
+        <input type="text" class="form-control" id="google_map" name="google_map" placeholder="Input Google map URL"
+          required pattern=".*\S+.*" value="{{ restaurant.google_map }}">
+        <div class="invalid-feedback">
+          請輸入有效資料
+        </div>
+      </div>
+    </div>
+    <div class="form-group row">
+      <label for="rating" class="col-sm-3 col-form-label">評分</label>
+      <div class="col-sm-6 mt-3">
+        <input type="range" class="form-control-range" id="rating" name="rating" min="0.0" max="5.0" step="0.1"
+          oninput="showRating(this.value)" value={{ restaurant.rating }}>
+      </div>
+      <div class="col-sm-3 mt-2">
+        <output class="ml-1 h4 text-primary" style="width: 40px" id="star-rating">{{ restaurant.rating }}</output>
+        <i class="fas fa-star ml-1 mt-0 text-warning h5 star"></i>
+        <i class="fas fa-star ml-1 mt-0 text-warning h5 star"></i>
+        <i class="fas fa-star ml-1 mt-0 text-warning h5 star"></i>
+        <i class="far fa-star ml-1 mt-0 text-warning h5 star"></i>
+        <i class="far fa-star ml-1 mt-0 text-warning h5 star"></i>
+      </div>
+    </div>
+    <div class="form-group row">
+      <label for="description" class="col-sm-3 col-form-label">詳情</label>
+      <div class="col-sm-9">
+        <textarea type="text" class="form-control" id="description" name="description" placeholder="Input description"
+          required pattern=".*\S+.*" rows="5">{{ restaurant.description }}</textarea>
+        <div class="invalid-feedback">
+          請輸入有效資料
+        </div>
+      </div>
+    </div>
+    <div class="form-group row">
+      <div class="col-sm-9 mt-2">
+        <button type="submit" class="btn btn-info">更新餐廳資料</button>
+      </div>
+    </div>
+  </form>
+</div>
+
+<script src="/javascripts/form.js" onload="showRating({{ restaurant.rating }})"></script>
