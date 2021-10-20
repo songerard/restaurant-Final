@@ -16,6 +16,10 @@ require('./config/mongoose')
 // load restaurant model
 const Restaurant = require('./models/restaurant')
 
+// require passport
+const usePassport = require('./config/passport')
+usePassport(app)
+
 // require method-override
 const methodOverride = require('method-override')
 app.use(methodOverride('_method'))
