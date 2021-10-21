@@ -20,6 +20,13 @@ const Restaurant = require('./models/restaurant')
 const usePassport = require('./config/passport')
 usePassport(app)
 
+// send req data to res.locals
+app.use((req, res, next) => {
+  res.locals.isAuthenticated = req.isAuthenticated
+  res.locals.user = req.user
+  next()
+})
+
 // require method-override
 const methodOverride = require('method-override')
 app.use(methodOverride('_method'))

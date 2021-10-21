@@ -4,7 +4,6 @@ module.exports = {
   authenticator: (req, res, next) => {
     // if authenticated, then next step
     if (req.isAuthenticated()) {
-      console.log('authed')
       return next()
     }
     // if not authenticated, then redirect to login page
