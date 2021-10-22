@@ -1,6 +1,9 @@
 // require mongodb connection
 const db = require('../../config/mongoose')
 
+// require bcryptjs
+const bcrypt = require('bcryptjs')
+
 // require Restaurant and User model
 const Restaurant = require('../restaurant')
 const User = require('../user')
@@ -30,18 +33,27 @@ db.once('open', () => {
   userSeeds.forEach(seed => {
     // get restaurantIdList for matching restaurant id later
     const restaurantIdList = seed.restaurantIdList
-    // create user list in mongodb
-    User.create(seed)
-      .then(user => {
-        const userId = user._id
-        restaurantIdList.forEach(restaurantId => {
-          // find a restaurant matches restaurant id of current user
-          const restaurant = restaurantSeeder.find(element => element.id === restaurantId)
-          restaurant.userId = userId
-          // create a restaurant in mongodb
-          Restaurant.create(restaurant)
-        })
+
+    // use bcryptjs to encrypt password
+    return bcrypt
+      .genSalt(10)
+      .then(salt => bcrypt.hash(seed.password, salt))
+      .then(hash => {
+        seed.password = hash
+        // create user list in mongodb
+        User.create(seed)
+          .then(user => {
+            const userId = user._id
+            restaurantIdList.forEach(restaurantId => {
+              // find a restaurant matches restaurant id of current user
+              const restaurant = restaurantSeeder.find(element => element.id === restaurantId)
+              restaurant.userId = userId
+              // create a restaurant in mongodb
+              Restaurant.create(restaurant)
+            })
+          })
+          .catch(error => console.error(error))
       })
-      .catch(error => console.error(error))
+
   })
 })
