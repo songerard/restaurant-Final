@@ -20,10 +20,16 @@ const Restaurant = require('./models/restaurant')
 const usePassport = require('./config/passport')
 usePassport(app)
 
+// require connect-flash
+const flash = require('connect-flash')
+app.use(flash())
+
 // send req data to res.locals
 app.use((req, res, next) => {
   res.locals.isAuthenticated = req.isAuthenticated
   res.locals.user = req.user
+  res.locals.successMsg = req.flash('successMsg')
+  res.locals.warningMsg = req.flash('warningMsg')
   next()
 })
 

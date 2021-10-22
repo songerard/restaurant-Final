@@ -48,6 +48,7 @@ router.post('/register', (req, res) => {
 // logout action
 router.get('/logout', (req, res) => {
   req.logout()
+  req.flash('successMsg', '你已經成功登出')
   res.redirect('/users/login')
 })
 

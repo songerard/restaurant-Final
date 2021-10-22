@@ -7,6 +7,7 @@ module.exports = {
       return next()
     }
     // if not authenticated, then redirect to login page
+    req.flash('warningMsg', '請先登入才能使用')
     res.redirect('/users/login')
   }
 }

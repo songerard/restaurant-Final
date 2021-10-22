@@ -13,15 +13,18 @@ module.exports = app => {
 
   // Configuration LocalStrategy
   passport.use(new LocalStrategy({
-    usernameField: 'email'
-  }, (email, password, done) => {
+    usernameField: 'email',
+    passReqToCallback: true
+  }, (req, email, password, done) => {
     User.findOne({ email })
       .then(user => {
         if (!user) {
-          return done(null, false, { message: 'Email not registered.' })
+          req.flash('warningMsg', '這電郵仍未註冊過')
+          return done(null, false)
         }
         if (password !== user.password) {
-          return done(null, false, { message: 'Incorrect password.' })
+          req.flash('warningMsg', '密碼錯誤')
+          return done(null, false)
         }
         return done(null, user)
       })
