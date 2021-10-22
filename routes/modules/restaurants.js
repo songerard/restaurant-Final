@@ -39,6 +39,8 @@ router.get('/new', (req, res) => {
 
 // add new restaurant into mongodb
 router.post('/', (req, res) => {
+  const userId = req.user._id
+
   let {
     name,
     name_en,
@@ -63,7 +65,8 @@ router.post('/', (req, res) => {
     phone,
     google_map,
     rating,
-    description
+    description,
+    userId
   })
     .then(() => res.redirect('/'))
     .catch(error => console.error(error))
@@ -71,7 +74,9 @@ router.post('/', (req, res) => {
 
 // show restaurant details page
 router.get('/:id', (req, res) => {
-  Restaurant.findById(req.params.id)
+  const userId = req.user._id
+  const _id = req.params.id
+  Restaurant.findOne({ _id, userId })
     .lean()
     .then(restaurant => res.render('show', { restaurant }))
     .catch(error => console.error(error))
@@ -92,7 +97,10 @@ router.get('/:id/edit', (req, res) => {
       allCategory.sort
     })
     .catch(error => console.error(error))
-  Restaurant.findById(req.params.id)
+
+  const userId = req.user._id
+  const _id = req.params.id
+  Restaurant.findOne({ _id, userId })
     .lean()
     .then(restaurant => {
       // render edit page and set restaurant's current category as default
@@ -104,8 +112,9 @@ router.get('/:id/edit', (req, res) => {
 
 // edit restaurant
 router.put('/:id', (req, res) => {
-  const id = req.params.id
-  Restaurant.findById(id)
+  const userId = req.user._id
+  const _id = req.params.id
+  Restaurant.findOne({ _id, userId })
     .then(restaurant => {
       Object.assign(restaurant, req.body)
       // update category if "Other category" exist
@@ -118,7 +127,9 @@ router.put('/:id', (req, res) => {
 
 // delete restaurant
 router.delete('/:id', (req, res) => {
-  Restaurant.findById(req.params.id)
+  const userId = req.user._id
+  const _id = req.params.id
+  Restaurant.findOne({ _id, userId })
     .then(restaurant => restaurant.remove())
     .then(() => res.redirect('/'))
     .catch(error => console.error(error))

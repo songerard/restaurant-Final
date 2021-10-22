@@ -9,7 +9,8 @@ const Restaurant = require('../../models/restaurant')
 
 // home page
 router.get('/', (req, res) => {
-  Restaurant.find()
+  const userId = req.user._id
+  Restaurant.find({ userId })
     .lean()
     .sort({ 'rating': 'desc', 'name': 'asc' })
     .then(restaurants => res.render('index', { restaurants }))
@@ -19,21 +20,27 @@ router.get('/', (req, res) => {
 // search restaurant
 router.get('/search', (req, res) => {
   const keyword = req.query.keyword.trim()
+  const userId = req.user._id
 
-  // get all restaurants from mongodb
+  // get all restaurants from mongodb by userId
   const allRestaurants = []
-  Restaurant.find()
+  Restaurant.find({ userId })
     .lean()
     .sort({ 'rating': 'desc', 'name': 'asc' })
     .then(restaurants => {
       allRestaurants.push(...restaurants)
     })
 
-  // filter restaurants by keyword in name or category
+  // filter restaurants by userId and keyword in name or category
   Restaurant.find({
-    $or: [
-      { 'name': { "$regex": keyword, "$options": "i" } },
-      { 'category': { "$regex": keyword, "$options": "i" } }
+    $and: [
+      { userId },
+      {
+        $or: [
+          { 'name': { "$regex": keyword, "$options": "i" } },
+          { 'category': { "$regex": keyword, "$options": "i" } }
+        ]
+      }
     ]
   })
     .lean()
@@ -76,8 +83,9 @@ router.get('/sort', (req, res) => {
     }
   })
 
-  // sort Restaurant according to selected sorting options
-  Restaurant.find()
+  // sort Restaurant according to selected sorting options by userId
+  const userId = req.user._id
+  Restaurant.find({ userId })
     .lean()
     .sort(selectedSortingOptions)
     .then(restaurants => res.render('index', { restaurants }))
