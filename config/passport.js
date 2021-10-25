@@ -1,7 +1,8 @@
-// require passport, local and facebook strategy
+// require passport, local, facebook and google strategy
 const passport = require('passport')
 const LocalStrategy = require('passport-local').Strategy
 const FacebookStrategy = require('passport-facebook').Strategy
+const GoogleStrategy = require('passport-google-oauth20').Strategy
 
 // require bcryptjs
 const bcrypt = require('bcryptjs')
@@ -68,6 +69,35 @@ module.exports = app => {
           .catch(err => done(err, false))
       })
   }))
+
+  // Configuration GoogleStrategy
+  passport.use(new GoogleStrategy({
+    clientID: process.env.GOOGLE_CLIENT_ID,
+    clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+    callbackURL: process.env.GOOGLE_CALLBACK
+  },(accessToken, refreshToken, profile, done) => {
+    const { name, email } = profile._json
+    User.findOne({ email })
+      .then(user => {
+        if (user) return done(null, user)
+
+        const randomPassword = Math.random().toString(36).slice(-8)
+        bcrypt
+          .genSalt(10)
+          .then(salt => bcrypt.hash(randomPassword, salt))
+          .then(hash => User.create({
+            name,
+            email,
+            password: hash
+          }))
+          .then(user => done(null, user))
+          .catch(err => done(err, false))
+      })
+      // User.findOrCreate({ googleId: profile.id }, function (err, user) {
+      //   return done(err, user)
+      // })
+    }
+  ))
 
   // serialize and deserialize user instances to and from the session
   passport.serializeUser((user, done) => {
