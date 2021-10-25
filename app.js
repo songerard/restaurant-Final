@@ -2,10 +2,15 @@
 const express = require('express')
 const app = express()
 
+// require dotenv
+if (process.env.NODE_ENV !== 'production') {
+  require('dotenv').config()
+}
+
 // require express-session
 const session = require('express-session')
 app.use(session({
-  secret: 'Restaurant',
+  secret: process.env.SESSION_SECRET,
   resave: false,
   saveUninitialized: true
 }))
@@ -30,6 +35,8 @@ app.use((req, res, next) => {
   res.locals.user = req.user
   res.locals.successMsg = req.flash('successMsg')
   res.locals.warningMsg = req.flash('warningMsg')
+  res.locals.email = req.flash('email')
+  res.locals.password = req.flash('password')
   next()
 })
 
@@ -47,7 +54,7 @@ const bodyParser = require('body-parser')
 app.use(express.urlencoded({ extended: true }))
 
 // set port
-const port = 3000
+const port = process.env.PORT
 
 // use static files
 app.use(express.static('public'))

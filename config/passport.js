@@ -1,6 +1,7 @@
-// require passport and local strategy
+// require passport, local and facebook strategy
 const passport = require('passport')
 const LocalStrategy = require('passport-local').Strategy
+const FacebookStrategy = require('passport-facebook').Strategy
 
 // require bcryptjs
 const bcrypt = require('bcryptjs')
@@ -23,6 +24,8 @@ module.exports = app => {
       .then(user => {
         if (!user) {
           req.flash('warningMsg', '這電郵仍未註冊過')
+          req.flash('email', email)
+          req.flash('password', password)
           return done(null, false)
         }
         return bcrypt
@@ -30,12 +33,40 @@ module.exports = app => {
           .then(isMatch => {
             if (!isMatch) {
               req.flash('warningMsg', '密碼錯誤')
+              req.flash('email', email)
+              req.flash('password', password)
               return done(null, false)
             }
             return done(null, user)
           })
       })
       .catch(err => done(err))
+  }))
+
+  // Configuration FacebookStrategy
+  passport.use(new FacebookStrategy({
+    clientID: process.env.FACEBOOK_ID,
+    clientSecret: process.env.FACEBOOK_SECRET,
+    callbackURL: process.env.FACEBOOK_CALLBACK,
+    profileFields: ['email', 'displayName']
+  }, (accessToken, refreshToken, profile, done) => {
+    const { name, email } = profile._json
+    User.findOne({ email })
+      .then(user => {
+        if (user) return done(null, user)
+
+        const randomPassword = Math.random().toString(36).slice(-8)
+        bcrypt
+          .genSalt(10)
+          .then(salt => bcrypt.hash(randomPassword, salt))
+          .then(hash => User.create({
+            name,
+            email,
+            password: hash
+          }))
+          .then(user => done(null, user))
+          .catch(err => done(err, false))
+      })
   }))
 
   // serialize and deserialize user instances to and from the session
