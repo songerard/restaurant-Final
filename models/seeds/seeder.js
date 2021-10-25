@@ -1,3 +1,8 @@
+// require dotenv
+if (process.env.NODE_ENV !== 'production') {
+  require('dotenv').config()
+}
+
 // require mongodb connection
 const db = require('../../config/mongoose')
 
@@ -12,7 +17,7 @@ const User = require('../user')
 const restaurantSeeder = require('../../restaurant.json').results
 
 // set user seeder
-const userSeeds = [
+const SEED_USER = [
   {
     name: 'user1',
     email: 'user1@example.com',
@@ -30,7 +35,7 @@ const userSeeds = [
 // once mongodb connected
 db.once('open', () => {
   console.log('create seeds!')
-  userSeeds.forEach(seed => {
+  SEED_USER.forEach(seed => {
     // get restaurantIdList for matching restaurant id later
     const restaurantIdList = seed.restaurantIdList
 
