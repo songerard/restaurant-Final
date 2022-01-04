@@ -39,35 +39,11 @@ router.get('/new', (req, res) => {
 
 // add new restaurant into mongodb
 router.post('/', (req, res) => {
-  const userId = req.user._id
+  req.body.userId = req.user._id
+  req.body.category = (req.body.category === '其他') ? req.body.other_category : req.body.category
 
-  let {
-    name,
-    name_en,
-    category,
-    other_category,
-    image,
-    location,
-    phone,
-    google_map,
-    rating,
-    description
-  } = req.body
-
-  category = (category === '其他') ? other_category : category
-
-  Restaurant.create({
-    name,
-    name_en,
-    category,
-    image,
-    location,
-    phone,
-    google_map,
-    rating,
-    description,
-    userId
-  })
+  const newRestaurant = new Restaurant(req.body)
+  newRestaurant.save()
     .then(() => res.redirect('/'))
     .catch(error => console.error(error))
 })
@@ -95,17 +71,17 @@ router.get('/:id/edit', (req, res) => {
         }
       })
       allCategory.sort
-    })
-    .catch(error => console.error(error))
 
-  const userId = req.user._id
-  const _id = req.params.id
-  Restaurant.findOne({ _id, userId })
-    .lean()
-    .then(restaurant => {
-      // render edit page and set restaurant's current category as default
-      selectedRestaurantCategory = restaurant.category
-      res.render('edit', { restaurant, allCategory })
+      const userId = req.user._id
+      const _id = req.params.id
+      Restaurant.findOne({ _id, userId })
+        .lean()
+        .then(restaurant => {
+          // render edit page and set restaurant's current category as default
+          selectedRestaurantCategory = restaurant.category
+          res.render('edit', { restaurant, allCategory })
+        })
+        .catch(error => console.error(error))
     })
     .catch(error => console.error(error))
 })
