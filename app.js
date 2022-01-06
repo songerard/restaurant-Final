@@ -53,6 +53,12 @@ app.set('view engine', 'handlebars')
 const bodyParser = require('body-parser')
 app.use(express.urlencoded({ extended: true }))
 
+// error handler
+app.use(function (err, req, res, next) {
+  console.error(err.stack)
+  res.status(500).send('Something broke!')
+})
+
 // set port
 const port = process.env.PORT
 
