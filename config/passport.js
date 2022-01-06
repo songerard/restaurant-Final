@@ -68,6 +68,7 @@ module.exports = app => {
           .then(user => done(null, user))
           .catch(err => done(err, false))
       })
+      .catch(err => done(err))
   }))
 
   // Configuration GoogleStrategy
@@ -75,7 +76,7 @@ module.exports = app => {
     clientID: process.env.GOOGLE_CLIENT_ID,
     clientSecret: process.env.GOOGLE_CLIENT_SECRET,
     callbackURL: process.env.GOOGLE_CALLBACK
-  },(accessToken, refreshToken, profile, done) => {
+  }, (accessToken, refreshToken, profile, done) => {
     const { name, email } = profile._json
     User.findOne({ email })
       .then(user => {
@@ -93,10 +94,8 @@ module.exports = app => {
           .then(user => done(null, user))
           .catch(err => done(err, false))
       })
-      // User.findOrCreate({ googleId: profile.id }, function (err, user) {
-      //   return done(err, user)
-      // })
-    }
+      .catch(err => done(err))
+  }
   ))
 
   // serialize and deserialize user instances to and from the session
