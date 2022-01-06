@@ -35,7 +35,7 @@ const SEED_USER = [
 // once mongodb connected
 db.once('open', () => {
   console.log('create seeds!')
-  SEED_USER.forEach(seed => {
+  Promise.all(SEED_USER.map(seed => {
     // get restaurantIdList for matching restaurant id later
     const restaurantIdList = seed.restaurantIdList
 
@@ -46,19 +46,24 @@ db.once('open', () => {
       .then(hash => {
         seed.password = hash
         // create user list in mongodb
-        User.create(seed)
+        return User.create(seed)
           .then(user => {
             const userId = user._id
+            const restaurantList = []
             restaurantIdList.forEach(restaurantId => {
               // find a restaurant matches restaurant id of current user
               const restaurant = restaurantSeeder.find(element => element.id === restaurantId)
               restaurant.userId = userId
-              // create a restaurant in mongodb
-              Restaurant.create(restaurant)
+              restaurantList.push(restaurant)
             })
+            // create a restaurant in mongodb
+            return Restaurant.create(restaurantList)
           })
-          .catch(error => console.error(error))
       })
-
-  })
+  }))
+    .then(() => {
+      console.log('seed created!')
+      process.exit()
+    })
+    .catch(error => console.error(error))
 })
