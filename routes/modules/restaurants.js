@@ -50,15 +50,12 @@ router.post('/', (req, res) => {
 
 // show restaurant details page
 router.get('/:id', (req, res, next) => {
-  somePromise
-    .then(() => {
-      const userId = req.user._id
-      const _id = req.params.id
-      Restaurant.findOne({ _id, userId })
-        .lean()
-        .then(restaurant => res.render('show', { restaurant }))
-      // .catch(error => console.error(error))
-    })
+  const userId = req.user._id
+  const _id = req.params.id
+  Restaurant.findOne({ _id, userId })
+    .lean()
+    .then(restaurant => res.render('show', { restaurant }))
+    // .catch(error => console.error(error))
     .catch(next)
 })
 
